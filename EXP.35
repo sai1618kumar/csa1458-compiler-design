@@ -1,0 +1,83 @@
+#include <stdio.h>
+#include <stdbool.h>
+#include <ctype.h>
+
+char *input;
+bool error = false;
+
+void match(char expected_token) {
+    if (*input == expected_token) {
+        input++;
+    } else {
+        printf("Error: Expected '%c' but found '%c'\n", expected_token, *input);
+        error = true;
+    }
+}
+
+bool is_digit(char token) {
+    return token >= '0' && token <= '9';
+}
+
+int factor() {
+    int result = 0;
+    if (is_digit(*input)) {
+        result = *input - '0';
+        input++;
+    } else if (*input == '(') {
+        match('(');
+        result = expression();
+        match(')');
+    } else {
+        printf("Error: Expected digit or '(' but found '%c'\n", *input);
+        error = true;
+    }
+    return result;
+}
+
+int term() {
+    int result = factor();
+    while (*input == '*' || *input == '/') {
+        char op = *input;
+        input++;
+        int next_factor = factor();
+        if (op == '*') {
+            result *= next_factor;
+        } else {
+            result /= next_factor;
+        }
+    }
+    return result;
+}
+
+int expression() {
+    int result = term();
+    while (*input == '+' || *input == '-') {
+        char op = *input;
+        input++;
+        int next_term = term();
+        if (op == '+') {
+            result += next_term;
+        } else {
+            result -= next_term;
+        }
+    }
+    return result;
+}
+
+int main() {
+    char input_string[100];
+
+    printf("Enter an arithmetic expression: ");
+    scanf("%s", input_string);
+
+    input = input_string;
+    int result = expression();
+
+    if (!error && *input == '\0') {
+        printf("Result: %d\n", result);
+    } else {
+        printf("Error: Invalid expression\n");
+    }
+
+    return 0;
+}
