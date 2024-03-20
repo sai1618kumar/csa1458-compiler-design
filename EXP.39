@@ -1,0 +1,35 @@
+#include <stdio.h>
+#include <string.h>
+
+#define MAX_LEN 100
+
+int main() {
+    char expr[MAX_LEN];
+    printf("Enter an expression: ");
+    scanf("%[^\n]", expr);
+
+    char subexpr[MAX_LEN];
+    int subexpr_count = 0;
+
+    printf("Optimized expression:\n");
+
+    for (int i = 0; expr[i] != '\0'; i++) {
+        if (expr[i] == '+' || expr[i] == '-' || expr[i] == '*' || expr[i] == '/') {
+            subexpr[subexpr_count] = '\0';
+            if (strlen(subexpr) > 0) {
+                printf("%s ", subexpr);
+            }
+            printf("%c ", expr[i]);
+            subexpr_count = 0;
+        } else {
+            subexpr[subexpr_count++] = expr[i];
+        }
+    }
+
+    subexpr[subexpr_count] = '\0';
+    if (strlen(subexpr) > 0) {
+        printf("%s", subexpr);
+    }
+
+    return 0;
+}
