@@ -1,0 +1,27 @@
+#include <stdio.h>
+#include <stdbool.h>
+#include <string.h>
+#include <ctype.h>
+
+bool is_operator(char op) {
+    return op == '+' || op == '-' || op == '*' || op == '/';
+}
+
+bool validate_operator(const char *input) {
+    // Check if the input is a single character and it's an operator
+    if (strlen(input) == 1 && is_operator(input[0])) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+int main() {
+    const char *operators[] = {"+", "-", "*", "/", "++", "--", "+=", "-=", "*=", "/="};
+
+    for (int i = 0; i < sizeof(operators) / sizeof(operators[0]); i++) {
+        printf("'%s' is a valid operator: %s\n", operators[i], validate_operator(operators[i]) ? "true" : "false");
+    }
+
+    return 0;
+}
