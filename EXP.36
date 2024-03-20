@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+
+// Function prototypes
+int parse_expression(char *expr);
+int parse_term(char *expr, int *index);
+int parse_factor(char *expr, int *index);
+
+int main() {
+    char expr[100];
+    printf("Enter an arithmetic expression: ");
+    scanf("%[^\n]", expr);
+
+    int result = parse_expression(expr);
+    printf("Result: %d\n", result);
+
+    return 0;
+}
+
+// Parse an arithmetic expression using recursive descent parsing
+int parse_expression(char *expr) {
+    int index = 0;
+    int result = parse_term(expr, &index);
+
+    while (expr[index] == '+' || expr[index] == '-') {
+        char op = expr[index++];
+        int term = parse_term(expr, &index);
+
+        if (op == '+') {
+            result += term;
+        } else {
+            result -= term;
+        }
+    }
+
+    return result;
+}
+
+// Parse a term (multiplication or division)
+int parse_term(char *expr, int *index) {
+    int result = parse_factor(expr, index);
+
+    while (expr[*index] == '*' || expr[*index] == '/') {
+        char op = expr[(*index)++];
+        int factor = parse_factor(expr, index);
+
+        if (op == '*') {
+            result *= factor;
+        } else {
+            result /= factor;
+        }
+    }
+
+    return result;
+}
+
+// Parse a factor (number or parentheses)
+int parse_factor(char *expr, int *index) {
+    int result;
+
+    if (expr[*index] == '(') {
+        (*index)++;
+        result = parse_expression(expr);
+        (*index)++;
+    } else {
+        result = 0;
+        while (isdigit(expr[*index])) {
+            result = result * 10 + (expr[(*index)++] - '0');
+        }
+    }
+
+    return result;
+}
