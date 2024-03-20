@@ -1,0 +1,57 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_LEN 100
+
+// Structure to represent an IR instruction
+typedef struct {
+    char opcode[10];
+    char arg1[10];
+    char arg2[10];
+    char result[10];
+} IRInstruction;
+
+int main() {
+    char input[MAX_LEN];
+    printf("Enter an arithmetic expression: ");
+    scanf("%[^\n]", input);
+
+    IRInstruction ir[MAX_LEN];
+    int ir_count = 0;
+
+    char temp[10];
+    int temp_count = 0;
+
+    for (int i = 0; input[i] != '\0'; i++) {
+        if (isdigit(input[i])) {
+            temp[temp_count++] = input[i];
+        } else if (input[i] == '+' || input[i] == '-' || input[i] == '*' || input[i] == '/') {
+            temp[temp_count] = '\0';
+            strcpy(ir[ir_count].opcode, "STORE");
+            strcpy(ir[ir_count].arg1, temp);
+            strcpy(ir[ir_count].result, "t1");
+            ir_count++;
+            temp_count = 0;
+
+            strcpy(ir[ir_count].opcode, "LOAD");
+            strcpy(ir[ir_count].arg1, "t1");
+            sprintf(ir[ir_count].arg2, "%c", input[i]);
+            strcpy(ir[ir_count].result, "t2");
+            ir_count++;
+        }
+    }
+
+    temp[temp_count] = '\0';
+    strcpy(ir[ir_count].opcode, "STORE");
+    strcpy(ir[ir_count].arg1, temp);
+    strcpy(ir[ir_count].result, "result");
+    ir_count++;
+
+    printf("IR Code:\n");
+    for (int i = 0; i < ir_count; i++) {
+        printf("%s %s %s %s\n", ir[i].opcode, ir[i].arg1, ir[i].arg2, ir[i].result);
+    }
+
+    return 0;
+}
