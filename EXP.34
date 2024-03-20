@@ -1,0 +1,28 @@
+#include <stdio.h>
+#include <stdbool.h>
+#include <string.h>
+
+bool is_palindrome(const char *str) {
+    int len = strlen(str);
+    for (int i = 0; i < len / 2; i++) {
+        if (str[i] != str[len - i - 1]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+int main() {
+    char input[100];
+
+    printf("Enter a string: ");
+    scanf("%s", input);
+
+    if (is_palindrome(input)) {
+        printf("The string is a palindrome.\n");
+    } else {
+        printf("The string is not a palindrome.\n");
+    }
+
+    return 0;
+}
