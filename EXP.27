@@ -1,0 +1,32 @@
+#include <stdio.h>
+#include <stdbool.h>
+#include <string.h>
+
+bool is_comment(const char *line) {
+    // Check for single line comment
+    if (strstr(line, "//") == line) {
+        return true;
+    }
+
+    // Check for multi-line comment
+    if (strstr(line, "/*") != NULL && strstr(line, "*/") != NULL) {
+        // Ensure "/*" occurs before "*/"
+        if (strstr(line, "/*") < strstr(line, "*/")) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+int main() {
+    const char *line1 = "int main() { // This is a comment";
+    const char *line2 = "/* This is a multi-line comment */";
+    const char *line3 = "int x = 5;";
+
+    printf("Line 1 is a comment: %s\n", is_comment(line1) ? "true" : "false");
+    printf("Line 2 is a comment: %s\n", is_comment(line2) ? "true" : "false");
+    printf("Line 3 is a comment: %s\n", is_comment(line3) ? "true" : "false");
+
+    return 0;
+}
