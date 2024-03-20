@@ -1,0 +1,92 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_LEN 100
+
+// Symbol table entry
+typedef struct SymbolEntry {
+    char name[MAX_LEN];
+    struct SymbolEntry* next;
+} SymbolEntry;
+
+// Symbol table
+SymbolEntry* symbol_table = NULL;
+
+// Function to add a symbol to the symbol table
+void add_symbol(const char* name) {
+    SymbolEntry* new_symbol = (SymbolEntry*)malloc(sizeof(SymbolEntry));
+    if (new_symbol == NULL) {
+        printf("Error: Memory allocation failed\n");
+        exit(1);
+    }
+
+    strcpy(new_symbol->name, name);
+    new_symbol->next = symbol_table;
+    symbol_table = new_symbol;
+    printf("Added symbol: %s\n", name);
+}
+
+// Function to search for a symbol in the symbol table
+SymbolEntry* search_symbol(const char* name) {
+    SymbolEntry* current = symbol_table;
+    while (current != NULL) {
+        if (strcmp(current->name, name) == 0) {
+            return current;
+        }
+        current = current->next;
+    }
+    return NULL;
+}
+
+// Function to delete a symbol from the symbol table
+void delete_symbol(const char* name) {
+    SymbolEntry* current = symbol_table;
+    SymbolEntry* prev = NULL;
+
+    while (current != NULL) {
+        if (strcmp(current->name, name) == 0) {
+            if (prev == NULL) {
+                symbol_table = current->next;
+            } else {
+                prev->next = current->next;
+            }
+            free(current);
+            printf("Deleted symbol: %s\n", name);
+            return;
+        }
+        prev = current;
+        current = current->next;
+    }
+
+    printf("Symbol not found: %s\n", name);
+}
+
+// Function to print all symbols in the symbol table
+void print_symbols() {
+    SymbolEntry* current = symbol_table;
+    printf("Symbols in the symbol table:\n");
+    while (current != NULL) {
+        printf("%s\n", current->name);
+        current = current->next;
+    }
+}
+
+int main() {
+    add_symbol("x");
+    add_symbol("y");
+    add_symbol("z");
+    print_symbols();
+
+    SymbolEntry* sym = search_symbol("y");
+    if (sym != NULL) {
+        printf("Found symbol: %s\n", sym->name);
+    } else {
+        printf("Symbol not found\n");
+    }
+
+    delete_symbol("y");
+    print_symbols();
+
+    return 0;
+}
