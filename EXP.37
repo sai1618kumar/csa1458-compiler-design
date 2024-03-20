@@ -1,0 +1,110 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
+
+// Structure to represent a three-address code instruction
+typedef struct {
+    char result[10];
+    char op;
+    char arg1[10];
+    char arg2[10];
+} ThreeAddressCode;
+
+// Function prototypes
+void generate_three_address_code(char *input, ThreeAddressCode *code, int *num_codes);
+int is_operator(char c);
+int precedence(char op);
+void push(char stack[], int *top, char c);
+char pop(char stack[], int *top);
+
+int main() {
+    char input[100];
+    printf("Enter an expression: ");
+    scanf("%[^\n]", input);
+
+    ThreeAddressCode code[100];
+    int num_codes = 0;
+
+    generate_three_address_code(input, code, &num_codes);
+
+    printf("Three Address Code:\n");
+    for (int i = 0; i < num_codes; i++) {
+        printf("%s := %s %c %s\n", code[i].result, code[i].arg1, code[i].op, code[i].arg2);
+    }
+
+    return 0;
+}
+
+// Generate three-address code for the given input expression
+void generate_three_address_code(char *input, ThreeAddressCode *code, int *num_codes) {
+    char stack[100];
+    int top = -1;
+
+    int temp_count = 0;
+
+    for (int i = 0; input[i] != '\0'; i++) {
+        if (isalnum(input[i])) {
+            char temp[10];
+            temp[0] = input[i];
+            temp[1] = '\0';
+            push(stack, &top, temp[0]);
+            sprintf(code[*num_codes].result, "t%d", temp_count++);
+            strcpy(code[*num_codes].arg1, temp);
+            strcpy(code[*num_codes].arg2, "");
+            code[*num_codes].op = ' ';
+            (*num_codes)++;
+        } else if (is_operator(input[i])) {
+            while (top >= 0 && precedence(stack[top]) >= precedence(input[i])) {
+                char op = pop(stack, &top);
+                char temp[10];
+                temp[0] = op;
+                temp[1] = '\0';
+                strcpy(code[*num_codes].arg2, code[*num_codes - 1].result);
+                strcpy(code[*num_codes].arg1, code[*num_codes - 2].result);
+                sprintf(code[*num_codes].result, "t%d", temp_count++);
+                code[*num_codes].op = op;
+                (*num_codes)++;
+            }
+            push(stack, &top, input[i]);
+        }
+    }
+
+    while (top >= 0) {
+        char op = pop(stack, &top);
+        char temp[10];
+        temp[0] = op;
+        temp[1] = '\0';
+        strcpy(code[*num_codes].arg2, code[*num_codes - 1].result);
+        strcpy(code[*num_codes].arg1, code[*num_codes - 2].result);
+        sprintf(code[*num_codes].result, "t%d", temp_count++);
+        code[*num_codes].op = op;
+        (*num_codes)++;
+    }
+}
+
+// Check if a character is an operator
+int is_operator(char c) {
+    return (c == '+' || c == '-' || c == '*' || c == '/');
+}
+
+// Get the precedence of an operator
+int precedence(char op) {
+    if (op == '*' || op == '/') {
+        return 2;
+    } else if (op == '+' || op == '-') {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+// Push a character onto the stack
+void push(char stack[], int *top, char c) {
+    stack[++(*top)] = c;
+}
+
+// Pop a character from the stack
+char pop(char stack[], int *top) {
+    return stack[(*top)--];
+}
